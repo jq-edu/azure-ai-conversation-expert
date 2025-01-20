@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "expert-console", "expert-console\expert-console.csproj", "{23502948-2E3D-4DA6-8D2F-625D8934C5DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "agent-api", "agent-api\agent-api.csproj", "{F9269B23-4610-48F9-8B38-5A2DA80D7ACF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23502948-2E3D-4DA6-8D2F-625D8934C5DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23502948-2E3D-4DA6-8D2F-625D8934C5DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23502948-2E3D-4DA6-8D2F-625D8934C5DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23502948-2E3D-4DA6-8D2F-625D8934C5DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9269B23-4610-48F9-8B38-5A2DA80D7ACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9269B23-4610-48F9-8B38-5A2DA80D7ACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9269B23-4610-48F9-8B38-5A2DA80D7ACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9269B23-4610-48F9-8B38-5A2DA80D7ACF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

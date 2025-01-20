@@ -1,0 +1,49 @@
+﻿@using ExpertConsole.Models
+@model IEnumerable<KBViewModel>
+
+@{
+    ViewData["Title"] = "Console Expert";
+    var userDisplayName = ViewData["UserDisplayName"] as string;
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bienvenue</h1>
+    <p>Bonjour @userDisplayName!</p>
+</div>
+
+@if (Model.Count() == 0)
+{
+    <div class="alert alert-warning" role="alert">
+        Vous n'avez accès à aucune base de connaissances.
+    </div>
+}
+else
+{
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Questions ouvertes</th>
+                    <th>Dernière question</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var kb in Model)
+                {
+                    <tr>
+                        <td>@kb.KbName</td>
+                        <td>@kb.OpenQuestions</td>
+                        <td>@kb.LastQuestionReceived</td>
+                        <td>
+                            <a asp-controller="Home" asp-action="Questions" asp-route-kbId="@kb.KbId" class="btn btn-primary">Questions</a>
+                            <a asp-controller="Home" asp-action="Index" asp-route-kbId="@kb.KbId" class="btn btn-primary">Gérer</a>
+                            <a asp-controller="Home" asp-action="Index" asp-route-kbId="@kb.KbId" class="btn btn-primary">Admin</a>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+ 

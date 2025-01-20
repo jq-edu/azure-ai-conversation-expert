@@ -1,0 +1,27 @@
+@agent_api_HostAddress = https://localhost:7002
+
+### happy path
+GET {{agent_api_HostAddress}}/api/kb?userName=joel@jqdev.onmicrosoft.com
+Accept: application/json
+X-Api-Key: 123
+
+### no userName
+GET {{agent_api_HostAddress}}/api/kb
+Accept: application/json
+X-Api-Key: 123
+
+### wrong userName
+GET {{agent_api_HostAddress}}/api/kb?userName=toto
+Accept: application/json
+X-Api-Key: 123
+
+### wrong api key
+GET {{agent_api_HostAddress}}/api/kb?userName=admin
+Accept: application/json
+X-Api-Key: 123456
+
+### wrong api key and wrong userName
+GET {{agent_api_HostAddress}}/api/kb?userName=toto
+Accept: application/json
+X-Api-Key: 123456
+

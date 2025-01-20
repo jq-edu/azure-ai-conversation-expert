@@ -1,0 +1,42 @@
+@using ExpertConsole.Models
+@model QuestionViewModel
+@{
+    ViewData["Title"] = "Console Expert";
+    var currentKb = ViewData["CurrentKnowledgeBase"] as KBViewModel;
+    var userDisplayName = ViewData["UserDisplayName"] as string;
+    if (currentKb == null)
+    {
+        throw new ArgumentNullException(nameof(currentKb));
+    }
+}
+
+<div class="text-center">
+    <h1 class="display-4">@currentKb.KbName</h1>
+    <p>Bonjour @userDisplayName!</p>
+</div>
+<div class="row">
+    <h3>Question demandée par @Model.Demandeur le @Model.DateDemande</h3>
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="QuestionId" />
+        <div class="form-group">
+            <label asp-for="Question" class="control-label"></label>
+            <textarea asp-for="Question" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Question" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Reponse" class="control-label"></label>
+            <textarea asp-for="Reponse" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Reponse" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Répondre" class="btn btn-primary" />
+            <input type="submit" value="Converser" class="btn btn-primary" disabled/>
+            <input type="submit" value="Fermer" class="btn btn-primary" disabled/>
+        </div>
+    </form>
+</div>
+<div class="row">
+    <h3>Historique pour @Model.Demandeur</h3>
+</div>
+
