@@ -21,9 +21,10 @@
 </div>
 <div class="row">
     <h3>Question demandée par @Model.Demandeur le @Model.DateDemande</h3>
-    <form asp-action="Edit">
+    <form asp-action="AddQnAPair" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="QuestionId" />
+        <input type="hidden" name="kbId" value="@currentKb.KbId" />
         <div class="form-group">
             <label asp-for="Question" class="control-label"></label>
             <textarea asp-for="Question" class="form-control" rows="3"></textarea>

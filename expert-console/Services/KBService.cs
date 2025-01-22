@@ -88,6 +88,16 @@ namespace ExpertConsole.Services
             return JsonSerializer.Deserialize<IEnumerable<QuestionViewModel>>(content) ?? Enumerable.Empty<QuestionViewModel>();
         }
 
+        public async Task AddQnAPairAsync(string kbId, string questionId, string question, string reponse, string userPrincipalName)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"api/kb/{kbId}/addQnAPair?expertId={userPrincipalName}",
+                new { questionId, question, reponse });
+            
+            ValidateAuthorization(response);
+
+            response.EnsureSuccessStatusCode();
+        }
+
         private void ValidateAuthorization(HttpResponseMessage response)
         {
             if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)

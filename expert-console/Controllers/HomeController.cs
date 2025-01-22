@@ -75,6 +75,20 @@ public class HomeController : Controller
         return View(question);
     }
 
+    public async Task<IActionResult> AddQnAPair(string kbId, string questionId, string question, string reponse)
+    {
+        var userInfo = await GetUserInfo();
+
+        _logger.LogInformation("Getting KB from Agent API");
+        var kb = await _kbService.GetKBAsync(kbId, userInfo.UserPrincipalName);
+        ViewData["CurrentKnowledgeBase"] = kb;
+
+        _logger.LogInformation("Answering question in Agent API");
+        await _kbService.AddQnAPairAsync(kbId, questionId, question, reponse, userInfo.UserPrincipalName);
+
+        return RedirectToAction("Questions", new { kbId });
+    }
+
     public IActionResult Conditions()
     {
         return View();

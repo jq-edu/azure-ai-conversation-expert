@@ -88,6 +88,15 @@ namespace AgentApi.Controllers
             });
         }
 
+        [ApiKey]
+        [HttpPost("{kbId}/addQnAPair")]
+        public ActionResult AddQnAPair([FromBody] AddQnAPairModel question, string expertId)
+        {
+            if (!IsValidUser(expertId)) return Unauthorized();
+
+            return Accepted();
+        }
+
         private bool IsValidUser(string expertId)
         {
             return expertId == "joel@jqdev.onmicrosoft.com";
