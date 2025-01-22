@@ -5,7 +5,7 @@ It will evolve overtime to include more features and capabilities. The sample wi
 - Azure Language Services
 - Azure OpenAI Services
 It includes in the orchestration the ability for an humain expert to take over the conversation when the AI is not able to provide 
-a garanteed answer.  At this moment, only a base for the Expert Console is provided. The API currently get the user email via the parameters, 
+a garanteed answer.  At this moment, only a base for the Expert Console is provided. The API currently is stubbed and get the user email via the parameters, 
 this will change latter to use the token to get the user profile.
 
 ## Disclaimer

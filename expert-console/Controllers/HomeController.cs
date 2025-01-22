@@ -23,12 +23,12 @@ public class HomeController : Controller
     
     public async Task<IActionResult> Index()
     {
-        var userPrincipalName = await GetUserPrincipalName();
+        var userInfo = await GetUserInfo();
 
         _logger.LogInformation("Getting KB from Agent API");
         try
         {
-            var kbs = await _kbService.GetKBAsync(userPrincipalName);
+            var kbs = await _kbService.GetKBAsync(userInfo.UserPrincipalName);
             return View(kbs);
         }
         catch (UnauthorizedAccessException ex)
@@ -40,29 +40,37 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Questions(string kbId)
     {
-        var userPrincipalName = await GetUserPrincipalName();
+        var userInfo = await GetUserInfo();
 
         _logger.LogInformation("Getting KB from Agent API");
-        var kb = await _kbService.GetKBAsync(kbId, userPrincipalName);
+        var kb = await _kbService.GetKBAsync(kbId, userInfo.UserPrincipalName);
         ViewData["CurrentKnowledgeBase"] = kb;
 
         _logger.LogInformation("Getting opened questions Agent API");
-        var questions = await _kbService.GetKBQuestionsAsync(kbId, userPrincipalName);
+        var questions = await _kbService.GetKBQuestionsAsync(kbId, userInfo.UserPrincipalName);
 
         return View(questions);
     }
 
     public async Task<IActionResult> QuestionDetail(string kbId, string questionId)
     {
-        var userPrincipalName = await GetUserPrincipalName();
+        var userInfo = await GetUserInfo();
 
         _logger.LogInformation("Getting KB from Agent API");
-        var kb = await _kbService.GetKBAsync(kbId, userPrincipalName);
+        var kb = await _kbService.GetKBAsync(kbId, userInfo.UserPrincipalName);
         ViewData["CurrentKnowledgeBase"] = kb;
 
         _logger.LogInformation("Getting question from Agent API");
-        var kbs = await _kbService.GetKBQuestionsAsync(kbId, userPrincipalName);
+        var kbs = await _kbService.GetKBQuestionsAsync(kbId, userInfo.UserPrincipalName);
         var question = kbs.FirstOrDefault(q => q.QuestionId == questionId);
+        if (question == null)
+        {
+            throw new KeyNotFoundException($"Question with ID {questionId} not found in knowledge base with ID {kbId}.");
+        }
+
+       _logger.LogInformation("Getting history for requester from Agent API");
+        var history = await _kbService.GetUserQuestionsHistoryAsync(question.Demandeur, kbId, userInfo.UserPrincipalName);
+        ViewData["UserHistory"] = history;
 
         return View(question);
     }
@@ -78,19 +86,36 @@ public class HomeController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-    private async Task<string> GetUserPrincipalName()
+    private async Task<UserViewModel> GetUserInfo()
     {
         _logger.LogInformation("Getting logged user info from Graph");
-        var userInfo = await _graphClient.Me.GetAsync();
-        if (userInfo == null)
+        var graphUserInfo = await _graphClient.Me.GetAsync();
+        if (graphUserInfo == null)
         {
             throw new Exception("No user found");
         }
-        if (userInfo.UserPrincipalName == null)
+        if (graphUserInfo.UserPrincipalName == null)
         {
             throw new Exception("No UPN found");
         }
+        if (graphUserInfo.DisplayName == null)
+        {
+            throw new Exception("No display name found");
+        }
+        if (graphUserInfo.Id == null)
+        {
+            throw new Exception("No user ID found");
+        }
+
+        var userInfo = new UserViewModel
+        {
+            UserId = graphUserInfo.Id,
+            UserPrincipalName = graphUserInfo.UserPrincipalName,
+            DisplayName = graphUserInfo.DisplayName
+        };
+
+        // Add user DisplayName to ViewData to be used in all views
         ViewData["UserDisplayName"] = userInfo.DisplayName;
-        return userInfo.UserPrincipalName;
+        return userInfo;
     }
 }

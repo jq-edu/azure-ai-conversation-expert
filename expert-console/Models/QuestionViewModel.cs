@@ -16,5 +16,7 @@ namespace ExpertConsole.Models
         public DateTime DateDemande { get; set; }
         [JsonPropertyName("reponse")]
         public string? Reponse { get; set; }
+        [JsonPropertyName("dateReponse")]
+        public DateTime? DateReponse { get; set; }
     }
 }

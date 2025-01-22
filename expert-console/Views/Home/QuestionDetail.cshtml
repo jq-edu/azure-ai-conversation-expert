@@ -4,9 +4,14 @@
     ViewData["Title"] = "Console Expert";
     var currentKb = ViewData["CurrentKnowledgeBase"] as KBViewModel;
     var userDisplayName = ViewData["UserDisplayName"] as string;
+    var history = ViewData["UserHistory"] as IEnumerable<QuestionViewModel>;
     if (currentKb == null)
     {
         throw new ArgumentNullException(nameof(currentKb));
+    }
+    if (history == null)
+    {
+        history = new List<QuestionViewModel>();
     }
 }
 
@@ -38,5 +43,37 @@
 </div>
 <div class="row">
     <h3>Historique pour @Model.Demandeur</h3>
+    @if (history.Count() == 0)
+    {
+        <div class="alert alert-warning" role="alert">
+            Il n'y a pas d'historique.
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date demandée</th>
+                    <th>Date répondue</th>
+                    <th>Question</th>
+                    <th>Réponse</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in history)
+                {
+                    <tr>
+                        <td>@item.DateDemande</td>
+                        <td>@item.DateReponse</td>
+                        <td>@item.Question</td>
+                        <td>@item.Reponse</td>
+                        <td>@item.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
 

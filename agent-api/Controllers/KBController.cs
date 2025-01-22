@@ -10,9 +10,9 @@ namespace AgentApi.Controllers
     {
         [ApiKey]
         [HttpGet]
-        public ActionResult<IEnumerable<KBModel>> Get(string userName)
+        public ActionResult<IEnumerable<KBModel>> Get(string expertId)
         {
-            if (!IsValidUser(userName)) return Unauthorized();
+            if (!IsValidUser(expertId)) return Unauthorized();
 
             var kbList = new List<KBModel>
             {
@@ -37,9 +37,9 @@ namespace AgentApi.Controllers
 
         [ApiKey]
         [HttpGet("{kbId}")]
-        public ActionResult<KBModel> GetKb(string kbId, string userName)
+        public ActionResult<KBModel> GetKb(string kbId, string expertId)
         {
-            if (!IsValidUser(userName)) return Unauthorized();
+            if (!IsValidUser(expertId)) return Unauthorized();
 
             return Ok(new KBModel
             {
@@ -52,9 +52,9 @@ namespace AgentApi.Controllers
 
         [ApiKey]
         [HttpGet("{kbId}/questions")]
-        public ActionResult<IEnumerable<QuestionModel>> GetKbQuestions(string kbId, string userName)
+        public ActionResult<IEnumerable<QuestionModel>> GetKbQuestions(string kbId, string expertId)
         {
-            if (!IsValidUser(userName)) return Unauthorized();
+            if (!IsValidUser(expertId)) return Unauthorized();
             var questions = new List<QuestionModel>();
 
             for (int i = 0; i < 10; i++)
@@ -74,9 +74,9 @@ namespace AgentApi.Controllers
 
         [ApiKey]
         [HttpGet("{kbId}/questions/{questionId}")]
-        public ActionResult<QuestionModel> GetKbQuestion(string kbId, string questionId, string userName)
+        public ActionResult<QuestionModel> GetKbQuestion(string kbId, string questionId, string expertId)
         {
-            if (!IsValidUser(userName)) return Unauthorized();
+            if (!IsValidUser(expertId)) return Unauthorized();
 
             return Ok(new QuestionModel
             {
@@ -88,9 +88,9 @@ namespace AgentApi.Controllers
             });
         }
 
-        private bool IsValidUser(string userName)
+        private bool IsValidUser(string expertId)
         {
-            return userName == "joel@jqdev.onmicrosoft.com";
+            return expertId == "joel@jqdev.onmicrosoft.com";
         }
     }
 }

@@ -13,9 +13,9 @@ namespace ExpertConsole.Services
             _httpClient = httpClientFactory.CreateClient("agent-api");
         }
 
-        public async Task<IEnumerable<KBViewModel>> GetKBAsync(string userId)
+        public async Task<IEnumerable<KBViewModel>> GetKBAsync(string expertId)
         {
-            var response = await _httpClient.GetAsync($"api/kb?userName={userId}");
+            var response = await _httpClient.GetAsync($"api/kb?expertId={expertId}");
 
             ValidateAuthorization(response);
 
@@ -24,9 +24,9 @@ namespace ExpertConsole.Services
             return JsonSerializer.Deserialize<IEnumerable<KBViewModel>>(content) ?? Enumerable.Empty<KBViewModel>();
         }
 
-        public async Task<KBViewModel> GetKBAsync(string kbId, string userId)
+        public async Task<KBViewModel> GetKBAsync(string kbId, string expertId)
         {
-            var response = await _httpClient.GetAsync($"api/kb/{kbId}?userName={userId}");
+            var response = await _httpClient.GetAsync($"api/kb/{kbId}?expertId={expertId}");
 
             ValidateAuthorization(response);
 
@@ -45,9 +45,9 @@ namespace ExpertConsole.Services
             return kbViewModel;
         }
 
-        public async Task<IEnumerable<QuestionViewModel>> GetKBQuestionsAsync(string kbId, string userName)
+        public async Task<IEnumerable<QuestionViewModel>> GetKBQuestionsAsync(string kbId, string expertId)
         {
-            var response = await _httpClient.GetAsync($"api/kb/{kbId}/questions?userName={userName}");
+            var response = await _httpClient.GetAsync($"api/kb/{kbId}/questions?expertId={expertId}");
 
             ValidateAuthorization(response);
 
@@ -56,9 +56,9 @@ namespace ExpertConsole.Services
             return JsonSerializer.Deserialize<IEnumerable<QuestionViewModel>>(content) ?? Enumerable.Empty<QuestionViewModel>();
         }
 
-        public async Task<QuestionViewModel> GetKBQuestionDetailAsync(string kbId, string questionId, string userName)
+        public async Task<QuestionViewModel> GetKBQuestionDetailAsync(string kbId, string questionId, string expertId)
         {
-            var response = await _httpClient.GetAsync($"api/kb/{kbId}/questions/{questionId}?userName={userName}");
+            var response = await _httpClient.GetAsync($"api/kb/{kbId}/questions/{questionId}?expertId={expertId}");
 
             ValidateAuthorization(response);
 
@@ -75,6 +75,17 @@ namespace ExpertConsole.Services
                 throw new InvalidOperationException("Deserialization of QuestionViewModel returned null.");
             }
             return questionViewModel;
+        }
+
+        public async Task<IEnumerable<QuestionViewModel>> GetUserQuestionsHistoryAsync(string requesterId, string kbId, string expertId)
+        {
+            var response = await _httpClient.GetAsync($"api/user/{requesterId}/history?expertId={expertId}&kbId={kbId}");
+
+            ValidateAuthorization(response);
+
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<QuestionViewModel>>(content) ?? Enumerable.Empty<QuestionViewModel>();
         }
 
         private void ValidateAuthorization(HttpResponseMessage response)

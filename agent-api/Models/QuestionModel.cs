@@ -8,5 +8,6 @@ namespace AgentApi.Models
         public required string Status { get; set; }
         public DateTime DateDemande { get; set; }
         public string? Reponse { get; set; }
+        public DateTime? DateReponse { get; set; }
     }
 }
