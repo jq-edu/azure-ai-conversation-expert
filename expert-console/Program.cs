@@ -50,7 +50,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseExceptionHandler(new ExceptionHandlerOptions
 {
-    ExceptionHandler = async ctx => {
+    ExceptionHandler = ctx => {
         var feature = ctx.Features.Get<IExceptionHandlerFeature>();
         if (feature?.Error is MsalUiRequiredException
             or { InnerException: MsalUiRequiredException }
@@ -59,6 +59,7 @@ app.UseExceptionHandler(new ExceptionHandlerOptions
             ctx.Response.Cookies.Delete($"{CookieAuthenticationDefaults.CookiePrefix}{CookieAuthenticationDefaults.AuthenticationScheme}");
             ctx.Response.Redirect(ctx.Request.GetEncodedPathAndQuery());
         }
+        return Task.CompletedTask;
     }
 });
 
