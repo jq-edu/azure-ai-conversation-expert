@@ -1,5 +1,9 @@
 using ExpertConsole.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using Microsoft.Net.Http.Headers;
 
@@ -9,7 +13,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
     .EnableTokenAcquisitionToCallDownstreamApi()
     .AddMicrosoftGraph()
-    .AddInMemoryTokenCaches();
+    .AddDistributedTokenCaches();
 
 // Add the HttpClient with the required services to connect to the KB API.
 builder.Services.AddHttpClient("agent-api", httpClient =>
@@ -43,6 +47,20 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    ExceptionHandler = async ctx => {
+        var feature = ctx.Features.Get<IExceptionHandlerFeature>();
+        if (feature?.Error is MsalUiRequiredException
+            or { InnerException: MsalUiRequiredException }
+            or { InnerException.InnerException: MsalUiRequiredException })
+        {
+            ctx.Response.Cookies.Delete($"{CookieAuthenticationDefaults.CookiePrefix}{CookieAuthenticationDefaults.AuthenticationScheme}");
+            ctx.Response.Redirect(ctx.Request.GetEncodedPathAndQuery());
+        }
+    }
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
