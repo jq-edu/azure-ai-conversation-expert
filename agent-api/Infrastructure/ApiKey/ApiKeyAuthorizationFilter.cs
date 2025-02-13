@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace AgentApi.Infrastructure;
+namespace AgentApi.Infrastructure.ApiKey;
 public class ApiKeyAuthorizationFilter : IAuthorizationFilter
 {
     private const string ApiKeyHeaderName = "X-Api-Key";

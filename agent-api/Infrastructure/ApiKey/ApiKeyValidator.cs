@@ -1,4 +1,4 @@
-namespace AgentApi.Infrastructure;
+namespace AgentApi.Infrastructure.ApiKey;
 public class ApiKeyValidator : IApiKeyValidator
 {
     private readonly string _expectedApiKey;

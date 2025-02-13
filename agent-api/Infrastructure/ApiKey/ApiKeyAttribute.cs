@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace AgentApi.Infrastructure;
+namespace AgentApi.Infrastructure.ApiKey;
 public class ApiKeyAttribute : ServiceFilterAttribute
 {
     public ApiKeyAttribute()

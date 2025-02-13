@@ -1,4 +1,4 @@
-using AgentApi.Infrastructure;
+using AgentApi.Infrastructure.ApiKey;
 using AgentApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
