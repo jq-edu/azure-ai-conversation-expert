@@ -45,7 +45,7 @@ namespace AgentApi.Bots
                 // validate greeting
 
                 // See if there are previous conversations saved in storage for the user
-                var userHistoryList = await _conversationRepository.GetItems<UserConversation>("SELECT * FROM c WHERE c.entraId = @pkey", new Dictionary<string, object> { { "@pkey", key } });
+                var userHistoryList = await _conversationRepository.GetItems<UserConversation>("SELECT * FROM c WHERE c.userObjectId = @pkey", new Dictionary<string, object> { { "@pkey", userId } });
 
                 // If there are previous conversations, check if there is an opened one.
                 var openedConversation = userHistoryList.FirstOrDefault(c => c.Status == "opened");
@@ -75,7 +75,7 @@ namespace AgentApi.Bots
             {
                 Id = Guid.NewGuid().ToString(),
                 KbId = kbId,
-                UserObjectId = key,
+                UserObjectId = userId,
                 Name = turnContext.Activity.From.Name,
                 StartTime = DateTime.UtcNow,
                 LastActivity = DateTime.UtcNow,
@@ -88,9 +88,10 @@ namespace AgentApi.Bots
             var result = await _questionAnsweringClient.GetAnswersAsync(text, project, new AnswersOptions { Size = 1 });
 
             // check if answer is null or empty or low threshold
-            if (result.Value.Answers == null || result.Value.Answers.Count == 0 || result.Value.Answers[0].Confidence < 0.7)
+            var answers = result.Value.Answers;
+            if (answers == null || answers.Count == 0 || answers[0].Confidence < 0.7)
             {
-                openedConversation.ConversationLog.Add(DateTime.UtcNow.ToString(), new KeyValuePair<string, string>("bot", result.Value.Answers[0].Answer));
+                openedConversation.ConversationLog.Add(DateTime.UtcNow.ToString(), new KeyValuePair<string, string>("bot", "no good answer found in kb"));
                 openedConversation.Status = "waiting-exert";
                 await turnContext.SendActivityAsync(MessageFactory.Text("Je suis en apprentissage constant et ne suis pas certain de la réponse. Je vous reviens sous peu."), cancellationToken);
             }
