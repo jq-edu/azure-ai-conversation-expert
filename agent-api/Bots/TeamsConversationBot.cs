@@ -1,10 +1,13 @@
-using System.Text.Encodings.Web;
 using AgentApi.Models.Bots;
 using AgentApi.Repository;
 using Azure.AI.Language.QuestionAnswering;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Teams;
 using Microsoft.Bot.Schema;
+using Azure.AI.OpenAI;
+using OpenAI.Chat;
+using Azure.Identity;
+using Azure.AI.OpenAI.Chat;
 
 namespace AgentApi.Bots
 {
@@ -15,11 +18,16 @@ namespace AgentApi.Bots
         private readonly ConversationRepository _conversationRepository;
         private readonly QuestionAnsweringClient _questionAnsweringClient;
 
-        public TeamsConversationBot(QuestionAnsweringClient questionAnsweringClient, KbInfoRepository kbInfoRepository, ConversationRepository conversationRepository, ILogger<TeamsConversationBot> logger)
+        // public TeamsConversationBot(QuestionAnsweringClient questionAnsweringClient, KbInfoRepository kbInfoRepository, ConversationRepository conversationRepository, ILogger<TeamsConversationBot> logger)
+        // {
+        //     _questionAnsweringClient = questionAnsweringClient;
+        //     _kbRepository = kbInfoRepository;
+        //     _conversationRepository = conversationRepository;
+        //     _logger = logger;
+        // }
+
+        public TeamsConversationBot(ILogger<TeamsConversationBot> logger)
         {
-            _questionAnsweringClient = questionAnsweringClient;
-            _kbRepository = kbInfoRepository;
-            _conversationRepository = conversationRepository;
             _logger = logger;
         }
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -45,22 +53,62 @@ namespace AgentApi.Bots
                 // validate greeting
 
                 // See if there are previous conversations saved in storage for the user
-                var userHistoryList = await _conversationRepository.GetItems<UserConversation>("SELECT * FROM c WHERE c.userObjectId = @pkey", new Dictionary<string, object> { { "@pkey", userId } });
+                // var userHistoryList = await _conversationRepository.GetItems<UserConversation>("SELECT * FROM c WHERE c.userObjectId = @pkey", new Dictionary<string, object> { { "@pkey", userId } });
 
                 // If there are previous conversations, check if there is an opened one.
-                var openedConversation = userHistoryList.FirstOrDefault(c => c.Status == "opened");
+                // var openedConversation = userHistoryList.FirstOrDefault(c => c.Status == "opened");
 
                 // if the user have a recent conversation, check if the user is asking for a new conversation
-                if (openedConversation != null && openedConversation.LastActivity.AddHours(8) < DateTime.UtcNow)
-                {
-                    //adaptive car new question or adding to existing conversation
-                    //break
-                }
+                //if (openedConversation != null && openedConversation.LastActivity.AddHours(8) < DateTime.UtcNow)
+                //{
+                //adaptive car new question or adding to existing conversation
+                //break
+                //}
 
                 // main logic to handle a new question
-                await HandleQuestion(userId, text, "", turnContext, cancellationToken);
+                //await HandleQuestion(userId, text, "", turnContext, cancellationToken);
+
+                string endpoint = "https://oai-testjq.openai.azure.com/";
+                string searchEndpoint = "https://srch-test-jq.search.windows.net";
+                string index = "test-index";
+                string deploymentName = "gpt-4o";
+                var systemMessage = "tu réponds toujours comme un cowboy et n'utilise pas d'émoticon";
+
+                var messages = new List<ChatMessage>
+                {
+                    new SystemChatMessage(systemMessage),
+                    new UserChatMessage(text)
+                };
+
+                var completionOptions = new ChatCompletionOptions
+                {
+                    MaxOutputTokenCount=800,
+                    TopP=0.95f,
+                    Temperature=0.01f,
+                    FrequencyPenalty=0.0f,
+                    PresencePenalty=0.0f
+                };
+
+                #pragma warning disable AOAI001 // Le type est utilisé à des fins d’évaluation uniquement et est susceptible d’être modifié ou supprimé dans les futures mises à jour. Supprimez ce diagnostic pour continuer.
+                var dataSources = new AzureSearchChatDataSource  
+                {  
+                    Endpoint = new Uri(searchEndpoint),  
+                    IndexName = index,  
+                    Authentication = DataSourceAuthentication.FromSystemManagedIdentity()  
+                };
+
+                completionOptions.AddDataSource(dataSources);
+                #pragma warning restore AOAI001 // Le type est utilisé à des fins d’évaluation uniquement et est susceptible d’être modifié ou supprimé dans les futures mises à jour. Supprimez ce diagnostic pour continuer.
+            
+                var azureClient = new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
+                var chatClient = azureClient.GetChatClient(deploymentName);
+
+                var result = await chatClient.CompleteChatAsync(messages, completionOptions);
+                var response = result.Value.Content[0].Text;
+                Console.WriteLine($"{result.Value.Role}: {response}");
+                await turnContext.SendActivityAsync(MessageFactory.Text(response), cancellationToken);
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 // Inform the user an error occurred.
                 _logger.LogError($"Error reading from storage: {e.Message}");

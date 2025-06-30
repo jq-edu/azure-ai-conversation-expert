@@ -37,52 +37,52 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>
 builder.Services.AddTransient<IBot, TeamsConversationBot>();
 
 // Add the ConversationRepository as a singleton
-builder.Services.AddSingleton<ConversationRepository>(q =>
-{
-    var options = builder.Configuration.GetSection("CosmosDb").Get<CosmosConfiguration>();
-    if (options == null)
-    {
-        throw new ArgumentNullException(nameof(options), "The CosmosDb configuration is missing or empty.");
-    }
-    var conversationContainerId = builder.Configuration.GetValue<string>("CosmosDb:ConversationContainerId");
-    if (string.IsNullOrEmpty(conversationContainerId))
-    {
-        throw new ArgumentNullException(nameof(conversationContainerId), "The CosmosDb:ConversationContainerId configuration value is missing or empty.");
-    }
-    options.ContainerId = conversationContainerId;
+// builder.Services.AddSingleton<ConversationRepository>(q =>
+// {
+//     var options = builder.Configuration.GetSection("CosmosDb").Get<CosmosConfiguration>();
+//     if (options == null)
+//     {
+//         throw new ArgumentNullException(nameof(options), "The CosmosDb configuration is missing or empty.");
+//     }
+//     var conversationContainerId = builder.Configuration.GetValue<string>("CosmosDb:ConversationContainerId");
+//     if (string.IsNullOrEmpty(conversationContainerId))
+//     {
+//         throw new ArgumentNullException(nameof(conversationContainerId), "The CosmosDb:ConversationContainerId configuration value is missing or empty.");
+//     }
+//     options.ContainerId = conversationContainerId;
 
-    return new ConversationRepository(options, new DefaultAzureCredential());
-});
+//     return new ConversationRepository(options, new DefaultAzureCredential());
+// });
 
-// Add the KbInfoRepository as a singleton
-builder.Services.AddSingleton<KbInfoRepository>(q =>
-{
-    var options = builder.Configuration.GetSection("CosmosDb").Get<CosmosConfiguration>();
-    if (options == null)
-    {
-        throw new ArgumentNullException(nameof(options), "The CosmosDb configuration is missing or empty.");
-    }
-    var kbContainerId = builder.Configuration.GetValue<string>("CosmosDb:KbContainerId");
-    if (string.IsNullOrEmpty(kbContainerId))
-    {
-        throw new ArgumentNullException(nameof(kbContainerId), "The CosmosDb:KbContainerId configuration value is missing or empty.");
-    }
-    options.ContainerId = kbContainerId;
+// // Add the KbInfoRepository as a singleton
+// builder.Services.AddSingleton<KbInfoRepository>(q =>
+// {
+//     var options = builder.Configuration.GetSection("CosmosDb").Get<CosmosConfiguration>();
+//     if (options == null)
+//     {
+//         throw new ArgumentNullException(nameof(options), "The CosmosDb configuration is missing or empty.");
+//     }
+//     var kbContainerId = builder.Configuration.GetValue<string>("CosmosDb:KbContainerId");
+//     if (string.IsNullOrEmpty(kbContainerId))
+//     {
+//         throw new ArgumentNullException(nameof(kbContainerId), "The CosmosDb:KbContainerId configuration value is missing or empty.");
+//     }
+//     options.ContainerId = kbContainerId;
 
-    return new KbInfoRepository(options, new DefaultAzureCredential());
-});
+//     return new KbInfoRepository(options, new DefaultAzureCredential());
+// });
 
-// Add the QuestionAnsweringClient as a singleton
-builder.Services.AddSingleton<QuestionAnsweringClient>(q =>
-{
-    var baseUrl = builder.Configuration.GetValue<string>("AzureAI:QuestionAnsweringBaseUrl");
-    if (string.IsNullOrEmpty(baseUrl))
-    {
-        throw new ArgumentNullException(nameof(baseUrl), "The AzureAI:QuestionAnsweringBaseUrl configuration value is missing or empty.");
-    }
+// // Add the QuestionAnsweringClient as a singleton
+// builder.Services.AddSingleton<QuestionAnsweringClient>(q =>
+// {
+//     var baseUrl = builder.Configuration.GetValue<string>("AzureAI:QuestionAnsweringBaseUrl");
+//     if (string.IsNullOrEmpty(baseUrl))
+//     {
+//         throw new ArgumentNullException(nameof(baseUrl), "The AzureAI:QuestionAnsweringBaseUrl configuration value is missing or empty.");
+//     }
 
-    return new QuestionAnsweringClient(new Uri(baseUrl), new DefaultAzureCredential());
-});
+//     return new QuestionAnsweringClient(new Uri(baseUrl), new DefaultAzureCredential());
+// });
 
 var app = builder.Build();
 
